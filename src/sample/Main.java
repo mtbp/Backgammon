@@ -19,12 +19,12 @@ public class Main extends Application {
     private static Pane root = new Pane();
     private static Group homeGroup = new Group();
 
-    private void setRect(Rectangle rect, float X, float Y, float Width, float Height, String colorCode){
+    private void setRect(Rectangle rect, float X){
         rect.setX(X);
-        rect.setY(Y);
-        rect.setWidth(Width);
-        rect.setHeight(Height);
-        rect.setFill(Color.web(colorCode));
+        rect.setY(B);
+        rect.setWidth((W - (4 * B))/2);
+        rect.setHeight((H - 2 * B));
+        rect.setFill(Color.web("#164623"));
     }
     private void setSVG(SVGPath svg, String path, String colorCode){
         svg.setContent(path);
@@ -37,16 +37,20 @@ public class Main extends Application {
         setSVG(border, "M 0,0 0," + H + " " + W + "," + H + " " + W + ",0 0,0 z" +
                 "m " + B + "," + B + path + "m " + W/2 + ",0" + path, "#552500");
         Rectangle half1 = new Rectangle();
-        setRect(half1, B, B, (W - (4 * B))/2, (H - 2 * B), "#164623");
+        setRect(half1, B);
         Rectangle half2 = new Rectangle();
-        setRect(half2, W/2 + B, B, (W - (4 * B))/2, (H - 2 * B), "#164623");
+        setRect(half2, W/2 + B);
         SVGPath home = new SVGPath();
         float hW = (W - 4 * B) / 12;
         float hH = (H - 2 * B - H / 5) / 2;
-        setSVG(home, "M " + B  + "," + B + " m " + hW + ",0 " + (-hW / 2) + "," + hH + " " + (-hW / 2) + "," + (-hH) + " z", "#da251d") ;
+        setSVG(home, "M " + B  + "," + B + " m " + hW + ",0 " + (-hW / 2) +
+                "," + hH + " " + (-hW / 2) + "," + (-hH) + " z", "#da251d") ;
         root.setPrefSize(W ,H );
-        Home home1 = new Home(1, B, W, H);
-        homeGroup.getChildren().addAll(home1);
+        Home[] homes = new Home[24];
+        for(int id = 1; id <= 24; id++) {
+            homes[(id - 1)] = new Home(id, B, W, H);
+            homeGroup.getChildren().addAll(homes[id - 1]);
+        }
         root.getChildren().addAll(border, half1, half2, homeGroup);
         return root;
     }
@@ -70,13 +74,28 @@ class Home extends SVGPath{
 
     Home(int id, float B, float W, float H){
         this.id = id;
-        int position = this.id / 12; // 0 for up 1 for down
-        int color = this.id % 2; // 0 for red 1 for yellow
-
+        int position = (id - 1) / 6; // 0 for up 1st half , 1 : up 2nd half, 2 : down 1st half, 3 : down 2nd half
+        int color = id % 2; // 0 for red 1 for yellow
+        float start = 0;
         float hW = (W - 4 * B) / 12;
         float hH = (H - 2 * B - H / 5) / 2;
-        setSVG(this, "M " + B  + "," + B + " m " + hW + ",0 " + (-hW / 2) +
-                "," + hH + " " + (-hW / 2) + "," + (-hH) + " z", "#da251d") ;
+        switch (position){
+            case 0 : start = (id - 1) * hW + B;
+                break;
+            case 1 : start = (id - 1) * hW + 3 * B;
+                break;
+            case 2 : start = (id - 13) * hW + B;
+                break;
+            case 3 : start = (id - 13) * hW + 3 * B;
+                break;
+        }
+
+        if(position < 2)
+            setSVG(this, "M " + start  + "," + B + " m " + hW + ",0 " + (-hW / 2) +
+                     "," + hH + " " + (-hW / 2) + "," + (-hH) + " z", color == 0 ? "#da251d" : "#dedcae") ;
+        else
+            setSVG(this, "M " + start  + "," + (H - B) + " m " + hW + ",0 " + (-hW / 2) +
+                    "," + (-hH) + " " + (-hW / 2) + "," + (hH) + " z", color == 1 ? "#da251d" : "#dedcae") ;
 
     }
 
