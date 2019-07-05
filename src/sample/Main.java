@@ -6,7 +6,9 @@ import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
@@ -18,6 +20,7 @@ public class Main extends Application {
     private static final float B = 20;
     private static Pane root = new Pane();
     private static Group homeGroup = new Group();
+    private static Group pieceGroup = new Group();
 
     private void setRect(Rectangle rect, float X){
         rect.setX(X);
@@ -30,7 +33,11 @@ public class Main extends Application {
         svg.setContent(path);
         svg.setFill(Color.web(colorCode));
     }
-    private Parent createContent(){
+    private Parent createContent() {
+        int[] place = new int[24];
+        for(int i = 0; i < 24; i++)
+            place[i] = 0;
+        place[0] = 1;
         SVGPath border = new SVGPath();
         String path = " " + (W - (4 * B))/2 + " ,0 0,"
                 + (H - 2 * B) +" " + (-(W - (4 * B))/2) + ",0 0," + (-(H - 2 * B)) +" z";
@@ -51,7 +58,19 @@ public class Main extends Application {
             homes[(id - 1)] = new Home(id, B, W, H);
             homeGroup.getChildren().addAll(homes[id - 1]);
         }
-        root.getChildren().addAll(border, half1, half2, homeGroup);
+
+        Piece[] pieces = new Piece[15];
+        int k = 0;
+        for(int homeId = 0; homeId <24; homeId++) {
+            if(place[homeId] != 0){
+                for(int pnum = 1; pnum <= place[homeId]; pnum++) {
+                    pieces[k] = new Piece(homeId + 1, pnum, B, W, H);
+                    k++;
+                    pieceGroup.getChildren().addAll(pieces[k -1]);
+                }
+            }
+        }
+        root.getChildren().addAll(border, half1, half2, homeGroup, pieceGroup);
         return root;
     }
     @Override
@@ -97,6 +116,37 @@ class Home extends SVGPath{
             setSVG(this, "M " + start  + "," + (H - B) + " m " + hW + ",0 " + (-hW / 2) +
                     "," + (-hH) + " " + (-hW / 2) + "," + (hH) + " z", color == 1 ? "#da251d" : "#dedcae") ;
 
+    }
+
+
+}
+class Piece extends Pane {
+
+
+    Piece(int homeID, int PieceID, float B, float W, float H){
+
+        float hW = (W - 4 * B) / 12;
+        float hH = (H - 2 * B - H / 5) / 2;
+
+        float r1 = 22;
+        float r2 = 20;
+        float r3 = 15;
+        float r4 = 10;
+        float shift = hW / 2;
+        Circle backCircle = new Circle(B + shift, B + r1, r1, Color.WHEAT);
+        backCircle.setStrokeWidth(0.5);
+        backCircle.setStroke(Color.BLACK);
+        Circle frontCircle1 = new Circle(B + shift, B + r1, r2, Color.BEIGE);
+        frontCircle1.setStrokeWidth(0.5);
+        frontCircle1.setStroke(Color.BLACK);
+        Circle frontCircle2 = new Circle(B + shift, B + r1, r3, Color.WHEAT);
+        frontCircle2.setStrokeWidth(0.5);
+        frontCircle2.setStroke(Color.BLACK);
+        Circle frontCircle3 = new Circle(B + shift, B + r1, r4, Color.BEIGE);
+        frontCircle3.setStrokeWidth(0.5);
+        frontCircle3.setStroke(Color.BLACK);
+
+        getChildren().addAll(backCircle, frontCircle1, frontCircle2, frontCircle3);
     }
 
 
