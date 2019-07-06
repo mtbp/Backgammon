@@ -12,11 +12,13 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
+import javafx.scene.text.Text;
+import java.util.ArrayList;
 
 public class Main extends Application {
 
     private static final float W = 680;
-    private static final float H = 520;
+    private static final float H = 560;
     private static final float B = 20;
     private static Pane root = new Pane();
     private static Group homeGroup = new Group();
@@ -33,11 +35,19 @@ public class Main extends Application {
         svg.setContent(path);
         svg.setFill(Color.web(colorCode));
     }
+
     private Parent createContent() {
         int[] place = new int[24];
         for(int i = 0; i < 24; i++)
             place[i] = 0;
-        place[0] = 1;
+        place[0] = 5;
+        place[4] = 103;
+        place[6] = 105;
+        place[11] = 2;
+        place[12] = 105;
+        place[16] = 3;
+        place[18] = 5;
+        place[23] = 102;
         SVGPath border = new SVGPath();
         String path = " " + (W - (4 * B))/2 + " ,0 0,"
                 + (H - 2 * B) +" " + (-(W - (4 * B))/2) + ",0 0," + (-(H - 2 * B)) +" z";
@@ -54,20 +64,17 @@ public class Main extends Application {
                 "," + hH + " " + (-hW / 2) + "," + (-hH) + " z", "#da251d") ;
         root.setPrefSize(W ,H );
         Home[] homes = new Home[24];
-        for(int id = 1; id <= 24; id++) {
-            homes[(id - 1)] = new Home(id, B, W, H);
-            homeGroup.getChildren().addAll(homes[id - 1]);
-        }
 
-        Piece[] pieces = new Piece[15];
-        int k = 0;
-        for(int homeId = 0; homeId <24; homeId++) {
-            if(place[homeId] != 0){
-                for(int pnum = 1; pnum <= place[homeId]; pnum++) {
-                    pieces[k] = new Piece(homeId + 1, pnum, B, W, H);
-                    k++;
-                    pieceGroup.getChildren().addAll(pieces[k -1]);
-                }
+        for(int homeId = 1; homeId <= 24; homeId++) {
+            //final int temp1 = pnum;
+            final int temp2 = homeId;
+            homes[(homeId - 1)] = new Home(homeId, B, W, H);
+            homes[(homeId - 1)].setPNum(place[homeId -1]);
+            homeGroup.getChildren().addAll(homes[homeId - 1]);
+            for(int pnum = 1; pnum <= (place[homeId - 1] > 100 ? place[homeId - 1] - 100 : place[homeId - 1]); pnum++) {
+                homes[homeId - 1].addPiece(B, W, H, (pnum > 8)? 1 : 0, place[homeId - 1] < 100, homeId > 12);
+
+                pieceGroup.getChildren().addAll(homes[homeId - 1].pieces.get(pnum - 1));
             }
         }
         root.getChildren().addAll(border, half1, half2, homeGroup, pieceGroup);
@@ -75,79 +82,147 @@ public class Main extends Application {
     }
     @Override
     public void start(Stage primaryStage) throws Exception {
-
         Scene scene = new Scene(createContent());
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+    public static void main(String[] args) {
+        launch(args);
     }
 }
 
 class Home extends SVGPath{
 
-    private int id;
+    ArrayList<Piece> pieces =new ArrayList<>();
+    private int pID = 0;
+    private int pNum = 0;
+    private float start = 0;
+    private float hW;
+    private int hID;
 
-     private void setSVG(SVGPath svg, String path, String colorCode){
+    private void setSVG(SVGPath svg, String path, String colorCode){
         svg.setContent(path);
         svg.setFill(Color.web(colorCode));
     }
 
-    Home(int id, float B, float W, float H){
-        this.id = id;
+    Home (int id, float B, float W, float H) {
+
+        this.hID = id;
         int position = (id - 1) / 6; // 0 for up 1st half , 1 : up 2nd half, 2 : down 1st half, 3 : down 2nd half
         int color = id % 2; // 0 for red 1 for yellow
-        float start = 0;
-        float hW = (W - 4 * B) / 12;
+
+        this.hW = (W - 4 * B) / 12;
         float hH = (H - 2 * B - H / 5) / 2;
+
         switch (position){
-            case 0 : start = (id - 1) * hW + B;
+            case 0 : this.start = (id - 1) * this.hW + B;
                 break;
-            case 1 : start = (id - 1) * hW + 3 * B;
+            case 1 : this.start = (id - 1) * this.hW + 3 * B;
                 break;
-            case 2 : start = (id - 13) * hW + B;
+            case 2 : this.start = (id - 13) * this.hW + B;
                 break;
-            case 3 : start = (id - 13) * hW + 3 * B;
+            case 3 : this.start = (id - 13) * this.hW + 3 * B;
                 break;
         }
 
         if(position < 2)
-            setSVG(this, "M " + start  + "," + B + " m " + hW + ",0 " + (-hW / 2) +
-                     "," + hH + " " + (-hW / 2) + "," + (-hH) + " z", color == 0 ? "#da251d" : "#dedcae") ;
+            setSVG(this, "M " + this.start  + "," + B + " m " + this.hW + ",0 " + (-this.hW / 2) +
+                     "," + hH + " " + (-this.hW / 2) + "," + (-hH) + " z", color == 0 ? "#da251d" : "#dedcae") ;
         else
-            setSVG(this, "M " + start  + "," + (H - B) + " m " + hW + ",0 " + (-hW / 2) +
-                    "," + (-hH) + " " + (-hW / 2) + "," + (hH) + " z", color == 1 ? "#da251d" : "#dedcae") ;
+            setSVG(this, "M " + this.start  + "," + (H - B) + " m " + this.hW + ",0 " + (-this.hW / 2) +
+                    "," + (-hH) + " " + (-this.hW / 2) + "," + (hH) + " z", color == 1 ? "#da251d" : "#dedcae") ;
+        setOnMouseClicked(event -> System.out.println("F"));
 
     }
 
+    void addPiece (float B, float W, float H, int x2, boolean color, boolean down){
+        Piece piece = new Piece(this.hID, this.pID, B, W, H, this.start, x2, color, this.hW,this.pNum, down);
+        this.pieces.add(piece);
+        this.pID++;
+    }
 
+    int getPnum(){
+        return this.pNum;
+    }
+
+    void setPNum(int pNum){
+        this.pNum = pNum;
+    }
 }
-class Piece extends Pane {
 
+class Piece extends Group{
 
-    Piece(int homeID, int PieceID, float B, float W, float H){
+    private int pID;
+    private int hID;
 
-        float hW = (W - 4 * B) / 12;
-        float hH = (H - 2 * B - H / 5) / 2;
+    private double mouseX, mouseY, oldMouseX, oldMouseY;;
+
+    Piece(int homeID, int pieceID, float B, float W ,float H, float start, int x2, boolean color, float hW, int nTop
+            ,boolean down) {
+
 
         float r1 = 22;
-        float r2 = 20;
-        float r3 = 15;
-        float r4 = 10;
-        float shift = hW / 2;
-        Circle backCircle = new Circle(B + shift, B + r1, r1, Color.WHEAT);
+        float r2 = 19;
+        float r3 = 16;
+        float r4 = 13;
+        float r5 = 8;
+        double r6 = 22.5;
+        this.pID = pieceID;
+        this.hID = homeID;
+
+        float xShift = start + hW / 2 ;
+        double yShift = (x2 == 0) ?  r1 * (1 + 1.25 * (pieceID)) :  r1 * (1.5 + 1.25 * (pieceID - 8));
+        yShift = down ? H - B - yShift: B + yShift;
+        final double yS = yShift;
+        Circle backCircle = new Circle(xShift, yShift, r1, color ? Color.WHEAT : Color.GRAY);
         backCircle.setStrokeWidth(0.5);
         backCircle.setStroke(Color.BLACK);
-        Circle frontCircle1 = new Circle(B + shift, B + r1, r2, Color.BEIGE);
+            Circle frontCircle1 = new Circle(xShift, yShift, r2, color ? Color.BEIGE : Color.BLACK);
         frontCircle1.setStrokeWidth(0.5);
-        frontCircle1.setStroke(Color.BLACK);
-        Circle frontCircle2 = new Circle(B + shift, B + r1, r3, Color.WHEAT);
+        frontCircle1.setStroke(color ? Color.BLACK : Color.WHITE);
+        Circle frontCircle2 = new Circle(xShift, yShift, r3, color ? Color.WHEAT : Color.GRAY);
         frontCircle2.setStrokeWidth(0.5);
-        frontCircle2.setStroke(Color.BLACK);
-        Circle frontCircle3 = new Circle(B + shift, B + r1, r4, Color.BEIGE);
+        frontCircle2.setStroke(color ? Color.BLACK : Color.WHITE);
+        Circle frontCircle3 = new Circle(xShift, yShift, r4, color ? Color.BEIGE : Color.BLACK);
         frontCircle3.setStrokeWidth(0.5);
-        frontCircle3.setStroke(Color.BLACK);
+        frontCircle3.setStroke(color ? Color.BLACK : Color.WHITE);
+        Circle frontCircle4 = new Circle(xShift, yShift, r5, color ? Color.WHEAT : Color.GRAY);
+        frontCircle4.setStrokeWidth(0.5);
+        frontCircle4.setStroke(color ? Color.BLACK : Color.WHITE);
+        getChildren().addAll(backCircle, frontCircle1, frontCircle2, frontCircle3, frontCircle4);
+        Circle selected = new Circle(xShift, yShift, r6, color ? Color.CYAN : Color.YELLOWGREEN);
+        selected.setStrokeWidth(0.5);
+        selected.setStroke(color ? Color.BLACK : Color.WHITE);
 
-        getChildren().addAll(backCircle, frontCircle1, frontCircle2, frontCircle3);
+        final int nMax = color ? nTop : nTop - 100;
+        if(nMax == this.getID() + 1) {
+            setOnMousePressed(event -> {
+                oldMouseX = event.getSceneX();
+                oldMouseY = event.getSceneY();
+                getChildren().clear();
+                getChildren().addAll(selected, frontCircle1, frontCircle2, frontCircle3, frontCircle4);
+               // System.out.println(this.hID);
+            });
+            setOnMouseDragged(event -> relocate(event.getSceneX() - oldMouseX + xShift - r1,
+                    event.getSceneY() - oldMouseY + yS - r1));
+            setOnMouseReleased(event -> {
+                mouseX = event.getSceneX();
+                mouseY = event.getSceneY();
+                getChildren().clear();
+                getChildren().addAll(frontCircle1, frontCircle2, frontCircle3, frontCircle4);
+                int x = 0;
+                if(mouseX < 320)
+                    x = (int) Math.floor(mouseX / 50 + 12);
+
+                if((mouseX > 360) & (mouseX < 660))
+                    x = (int) Math.floor((mouseX - 360)/ 50 + 18);
+
+                System.out.println(x + 1);
+            });
+        }
     }
-
+     int getID(){
+        return this.pID;
+     }
 
 }
