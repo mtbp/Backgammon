@@ -19,7 +19,7 @@ public class Main extends Application {
 
     private static final float W = 680;
     private static final float H = 560;
-    private static final float B = 20;
+    private static final float B = 25;
     private static Pane root = new Pane();
     private static Group homeGroup = new Group();
     private static Group pieceGroup = new Group();
@@ -166,7 +166,7 @@ class Piece extends Group{
         float r3 = 16;
         float r4 = 13;
         float r5 = 8;
-        double r6 = 22.5;
+        double r6 = 24;
         this.pID = pieceID;
         this.hID = homeID;
 
@@ -200,8 +200,13 @@ class Piece extends Group{
                 oldMouseX = event.getSceneX();
                 oldMouseY = event.getSceneY();
                 getChildren().clear();
-                getChildren().addAll(selected, frontCircle1, frontCircle2, frontCircle3, frontCircle4);
-               // System.out.println(this.hID);
+                getChildren().addAll(selected, backCircle, frontCircle1, frontCircle2, frontCircle3, frontCircle4);
+                if (this.hID <= 12)
+                    this.hID += 12;
+                else
+                    this.hID = 25 - this.hID;
+
+                System.out.println("start : " + this.hID);
             });
             setOnMouseDragged(event -> relocate(event.getSceneX() - oldMouseX + xShift - r1,
                     event.getSceneY() - oldMouseY + yS - r1));
@@ -209,15 +214,21 @@ class Piece extends Group{
                 mouseX = event.getSceneX();
                 mouseY = event.getSceneY();
                 getChildren().clear();
-                getChildren().addAll(frontCircle1, frontCircle2, frontCircle3, frontCircle4);
+                getChildren().addAll(backCircle, frontCircle1, frontCircle2, frontCircle3, frontCircle4);
                 int x = 0;
-                if(mouseX < 320)
-                    x = (int) Math.floor(mouseX / 50 + 12);
+                if(mouseX < 320 & mouseX > 20 & mouseY > 20 & mouseY < 228)
+                    x = (int) Math.floor((mouseX - 20)/ 50 + 12);
 
-                if((mouseX > 360) & (mouseX < 660))
+                if((mouseX > 360) & (mouseX < 660) & mouseY > 20 & mouseY < 228)
                     x = (int) Math.floor((mouseX - 360)/ 50 + 18);
 
-                System.out.println(x + 1);
+                if((mouseX > 20) & (mouseX < 320) & mouseY > 332 & mouseY < 540)
+                    x = (int) Math.floor(-(mouseX - 20)/ 50 + 12);
+
+                if((mouseX > 360) & (mouseX < 660) & mouseY > 332 & mouseY < 540)
+                    x = (int) Math.floor(-(mouseX - 360)/ 50 + 6);
+
+                System.out.println("  end : " + (x + 1));
             });
         }
     }
