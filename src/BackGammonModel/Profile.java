@@ -1,0 +1,69 @@
+package BackGammonModel;
+
+import java.net.CookiePolicy;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
+public class Profile {
+    int playerNo;
+    int checkersIn;
+    int checkersOut;
+    int checkersHit;
+    boolean hasHit;
+    boolean canTakeOut;
+    Color color;
+
+    public Profile(int playerNo, int checkersHit, int checkersIn, int checkersOut, Color color){
+        this.playerNo = playerNo;
+        this.checkersIn = checkersIn;
+        this.checkersOut = checkersOut;
+        this.checkersHit = checkersHit;
+        this.color = color;
+    }
+
+    public boolean checkCanTakeOut(Checker[] checkers){
+        int count = 0;
+        if(color == Color.WHITE) {
+            for (int i = 0; i < 15; i++) {
+                if (checkers[i].pointNo <= 6) {
+                    count++;
+                }
+            }
+        }
+        else {
+            for(int i = 0; i<15; i++){
+                if(checkers[i].pointNo>=19){
+                    count++;
+                }
+            }
+        }
+        if(count == 15){
+            return TRUE;
+        }
+        else{
+            return FALSE;
+        }
+    }
+
+    int maxPointIndex(Checker[] checkers){
+        int count;
+        if(color == Color.WHITE){
+            count = 0;
+            for(int i = 0; i < 15; i++){
+                if(checkers[i].pointNo > count){
+                    count = checkers[i].pointNo;
+                }
+            }
+        }
+        else{
+            count = 25;
+            for(int i = 0; i < 15; i++){
+                if(checkers[i].pointNo < count){
+                    count = checkers[i].pointNo;
+                }
+            }
+        }
+        return count;
+    }
+}
