@@ -139,13 +139,21 @@ public class Controller {
                     mouseY = event.getSceneY();
                     int end;
                     end = view.homes[index].pieces.get(view.homes[index].pieces.size() - 1).released(mouseX, mouseY);
-                    System.out.println((start - 1)+" "+(end-1));
-                    boolean validmove =  model.isMovePossible(start -1 , end-1);
-                    //validmove = true;
-                    System.out.println((start-1) + " "+ (end-1)+ " "+validmove);
+                    //boolean validmove =  model.isMovePossible(start -1 , end-1);
+                    boolean validmove = true;
+                    System.out.println((start-1) + " "+ (end-1)+ " "+ validmove);
+
+                    int mystart = start <= 12 ? 24 - start : start - 13;
+                    int myend = end <= 12 ? 24 - end : end - 13;
+                    System.out.println("mystart = " + mystart );
+                    System.out.println("myend = " + myend );
                     if(validmove){
-                        view.homes[start - 1].removePiece();
-                        view.homes[end -1].addPiece(view.B, view.W, view.H,0, false, end > 12);
+                        view.homes[mystart].removePiece();
+                        view.homes[myend].addPiece(view.B, view.W, view.H,0, true, end < 12);
+                        view.pieceGroup.getChildren().clear();
+                        for(int u = 0; u < 24; u++)
+                            for(int y = 0; y < view.homes[u].pieces.size(); y++)
+                                view.pieceGroup.getChildren().addAll(view.homes[u].pieces.get(y));
                     }
 
                 });
@@ -153,3 +161,4 @@ public class Controller {
         }
     }
 }
+

@@ -73,7 +73,7 @@ public class View  {
     private static Pane root = new Pane();
     private static Pane rootStart = new Pane();
     private static Group homeGroup = new Group();
-    private static Group pieceGroup = new Group();
+    public static Group pieceGroup = new Group();
     Home[] homes = new Home[24];
     public Dice dice, dice2;
     TextField player2name = new TextField();
@@ -245,13 +245,16 @@ class Home extends Group{
     }
 
     void addPiece (float B, float W, float H, int x2, boolean color, boolean down){
-        Piece piece = new Piece(this.hID, this.pID, B, W, H, this.start, x2, color, this.hW,this.pNum, down);
+        Piece piece = new Piece(this.hID, this.pieces.size(), B, W, H, this.start, x2, color, this.hW,this.pNum, down);
         this.pieces.add(piece);
         this.pID++;
+//        this.getChildren().addAll(pieces);
     }
     void removePiece(){
         this.pieces.remove(this.pieces.size()-1);
         this.pNum--;
+      //  this.getChildren().clear();
+       // this.getChildren().addAll(pieces);
     }
 
     void canMove(){
@@ -338,7 +341,7 @@ class Piece extends Group{
         else
             start = (25 - this.hID);
 
-        //System.out.println("start : " + start);
+        System.out.println("start : " + start);
 
         return start;
 
@@ -372,8 +375,8 @@ class Piece extends Group{
         if((mouseX > 360) & (mouseX < 660) & mouseY > 332 & mouseY < 540)
             x = (int) Math.floor(-(mouseX - 360)/ 50 + 6);
 
-        //System.out.println("  end : " + (x + 1));
-        return (x + 1);
+        System.out.println("  end : " + (x + 1));
+        return (x+1);
     }
 
     /*int getID(){
