@@ -82,7 +82,7 @@ public class Model {
         else{
             playerNo = 2;
         }
-        game.turn = color;
+        //game.turn = color;
         if(color == Color.WHITE){
             whiteProfile = new Profile(playerNo, Color.WHITE);
             blackProfile = new Profile(3 - playerNo, Color.BLACK);
@@ -92,7 +92,7 @@ public class Model {
             blackProfile = new Profile(playerNo, Color.BLACK);
         }
         game = new Game(color);
-        
+
         //System.out.println(whiteProfile.playerNo+" "+blackProfile.playerNo);
     }
 
@@ -112,7 +112,7 @@ public class Model {
             minIndex = 1 - maxIndex;
         }
         else{
-            if(dice[0].isPlayed)    index = 1;
+            if(!dice[0].isPlayed)    index = 1;
         }
         //System.out.println(index);
          int dest, dest2;
@@ -131,26 +131,25 @@ public class Model {
                     if (point[dest-1].status != PointStatus.BLACK)
                         canMove[25] = true;
                 }
+
                 else if (whiteProfile.checkCanTakeOut(whiteChecker)) {
                     if (whiteProfile.lastCheckerIndex <= dice[index].value)
                         canMove[whiteProfile.lastCheckerIndex] = true;
                     else {
                         for (int i = 1; i <= whiteProfile.lastCheckerIndex; i++) {
                             dest = i - dice[index].value;
-                            if ((dest > 0 && point[dest].status != PointStatus.BLACK) || dest == 0)
+                            if ((dest > 0 && point[dest-1].status != PointStatus.BLACK) || dest == 0)
                                 canMove[i] = true;
                         }
                     }
                 }
-                else {
-                    System.out.println("im in");
 
+                else {
                     for (int i = 1; i <= 24; i++) {
                         if (point[i-1].status == PointStatus.WHITE || point[i-1].status == PointStatus.WHITEBLOT) {
                             dest = i - dice[index].value;
                             if ((dest > 0 && point[dest-1].status != PointStatus.BLACK))
                                 canMove[i] = true;
-                            //System.out.println(i+" " +dest+" "+point[dest-1].status +" "+ point[i-1].status);
                         }
                     }
                 }
@@ -162,7 +161,9 @@ public class Model {
                     dest = 25 - dice[index].value;
                     if (point[dest].status != PointStatus.BLACK)
                         canMove[25] = true;
-                } else if (whiteProfile.checkCanTakeOut(whiteChecker)) {
+                }
+
+                else if (whiteProfile.checkCanTakeOut(whiteChecker)) {
                     if (whiteProfile.lastCheckerIndex <= dice[index].value)
                         canMove[whiteProfile.lastCheckerIndex] = true;
                     else {
@@ -172,8 +173,10 @@ public class Model {
                                 canMove[i] = true;
                         }
                     }
-                } else {
-                    System.out.println("hellooooo111111");
+                }
+
+                else {
+                    //System.out.println("hellooooo111111");
                     for (int i = 0; i < 24; i++) {
                         if (point[i].status == PointStatus.BLACK || point[i].status == PointStatus.BLACKBLOT) {
                             moveCheck[0][i] = 100 + point[i].checkersNumber;
@@ -190,14 +193,18 @@ public class Model {
                     //moveCheck[0][0] = 0;
                     //moveCheck[0][25] = 0;
 
-                    for (int i = 0; i < 24; i++) {
-                        moveCheck[1][i] = moveCheck[0][i];
+                    for (int j = 0; j < 24; j++) {
+                        moveCheck[1][j] = moveCheck[0][j];
                     }
 
                     int count = 0;
                     //int firstSmallerDice = 0;
                     for (int i = 1; i < 25; i++) {
                         if (moveCheck[0][i-1] > 0 && moveCheck[0][i-1] < 100) {
+                            for (int j = 0; j < 24; j++) {
+                                moveCheck[1][j] = moveCheck[0][j];
+                            }
+
                             dest = i - dice[maxIndex].value;
                             if (dest > 0){
                                 if (moveCheck[0][dest - 1] <= 101) {
@@ -223,6 +230,11 @@ public class Model {
                     if (count == 0) {
                         for (int i = 1; i < 25; i++) {
                             if (moveCheck[0][i-1] > 0 && moveCheck[0][i-1] < 100) {
+                                for (int j = 0; j < 24; j++) {
+                                    moveCheck[1][j] = moveCheck[0][j];
+                                }
+
+
                                 dest = i - dice[minIndex].value;
                                 if(dest>0) {
                                     if (moveCheck[0][dest - 1] <= 101) {
@@ -237,7 +249,7 @@ public class Model {
                                                     if (moveCheck[1][dest2 - 1] <= 101) {
                                                         canMove[i] = true;
                                                         count = 1;
-                                                        game.smallerDiceFirst = false;
+                                                        game.smallerDiceFirst = true;
                                                     }
                                                 }
                                             }
@@ -257,15 +269,14 @@ public class Model {
                         if (count == 0) {
                             for (int i = 1; i < 25; i++) {
                                 canMove[i] = canMoveMin[i];
+                                game.smallerDiceFirst = true;
                             }
                         } else {
                             for (int i = 1; i < 25; i++) {
                                 canMove[i] = canMoveMax[i];
                             }
                         }
-
                     }
-
                 }
             }
         }
@@ -277,6 +288,7 @@ public class Model {
                     if (point[dest-1].status != PointStatus.WHITE)
                         canMove[0] = true;
                 }
+
                 else if (blackProfile.checkCanTakeOut(blackChecker)) {
                     if ((25 - blackProfile.lastCheckerIndex) <= dice[index].value)
                         canMove[blackProfile.lastCheckerIndex] = true;
@@ -288,13 +300,13 @@ public class Model {
                         }
                     }
                 }
+
                 else {
                     for (int i = 1; i <= 24; i++) {
                         if (point[i-1].status == PointStatus.BLACK || point[i-1].status == PointStatus.BLACKBLOT) {
                             dest = i + dice[index].value;
                             if ((dest < 25 && point[dest-1].status != PointStatus.WHITE))
                                 canMove[i] = true;
-                            //System.out.println(i+" " +dest+" "+point[dest-1].status +" "+ point[i-1].status);
                         }
                     }
                 }
@@ -306,7 +318,8 @@ public class Model {
                     dest = dice[index].value;
                     if (point[dest-1].status != PointStatus.WHITE)
                         canMove[0] = true;
-                } else if (blackProfile.checkCanTakeOut(blackChecker)) {
+                }
+                else if (blackProfile.checkCanTakeOut(blackChecker)) {
                     if ((25-blackProfile.lastCheckerIndex) <= dice[index].value)
                         canMove[blackProfile.lastCheckerIndex] = true;
                     else {
@@ -316,7 +329,8 @@ public class Model {
                                 canMove[i] = true;
                         }
                     }
-                } else {
+                }
+                else {
                     //System.out.println("hellooooo111111");
                     for (int i = 0; i < 24; i++) {
                         if (point[i].status == PointStatus.WHITE || point[i].status == PointStatus.WHITEBLOT) {
@@ -334,13 +348,14 @@ public class Model {
                     //moveCheck[0][0] = 0;
                     //moveCheck[0][25] = 0;
 
-                    for (int i = 0; i < 24; i++) {
-                        moveCheck[1][i] = moveCheck[0][i];
-                    }
 
                     int count = 0;
                     for (int i = 1; i < 25; i++) {
                         if (moveCheck[0][i-1] > 0 && moveCheck[0][i-1] < 100) {
+                            for (int j = 0; j < 24; j++) {
+                                moveCheck[1][j] = moveCheck[0][j];
+                            }
+
                             dest = i + dice[maxIndex].value;
                             if (dest < 25){
                                 if (moveCheck[0][dest - 1] <= 101) {
@@ -366,6 +381,10 @@ public class Model {
                     if (count == 0) {
                         for (int i = 1; i < 25; i++) {
                             if (moveCheck[0][i-1] > 0 && moveCheck[0][i-1] < 100) {
+                                for (int j = 0; j < 24; j++) {
+                                    moveCheck[1][j] = moveCheck[0][j];
+                                }
+
                                 dest = i + dice[minIndex].value;
                                 if(dest < 25) {
                                     if (moveCheck[0][dest - 1] <= 101) {
@@ -400,6 +419,7 @@ public class Model {
                         if (count == 0) {
                             for (int i = 1; i < 25; i++) {
                                 canMove[i] = canMoveMin[i];
+                                game.smallerDiceFirst = true;
                             }
                         } else {
                             for (int i = 1; i < 25; i++) {
