@@ -437,7 +437,7 @@ public class Model {
 
     boolean[] canPoint = new boolean[24];
 
-    public boolean[] checkPoint(int pointNo){
+    public boolean[] checkPoint(int pointNo){ // pointNo -> [1,24]
         for(int i = 0; i < 24; i++){
             canPoint[i] = false;
         }
@@ -473,32 +473,44 @@ public class Model {
         }
         if(game.turn == Color.WHITE) {
             if(diceIsPlayed == 1) {
-                if(point[pointNo - 1 - dice[diceIndex].value].status != PointStatus.BLACK){
-                    canPoint[pointNo - 1 - dice[diceIndex].value] = true;
+                if (pointNo - 1 - dice[diceIndex].value > 0) {
+                    if (point[pointNo - 1 - dice[diceIndex].value].status != PointStatus.BLACK) {
+                        canPoint[pointNo - 1 - dice[diceIndex].value] = true;
+                    }
                 }
             }
-            else{
+            else {
                 int n = pointNo - 1 - dice[firstDice].value;
-                if(point[n].status != PointStatus.BLACK){
-                    canPoint[n] = true;
-                    if(point[n - dice[secondDice].value].status != PointStatus.BLACK){
-                        canPoint[n - dice[secondDice].value] = true;
+                if (n > 0) {
+                    if (point[n].status != PointStatus.BLACK) {
+                        canPoint[n] = true;
+                        if (n - dice[secondDice].value > 0) {
+                            if (point[n - dice[secondDice].value].status != PointStatus.BLACK) {
+                                canPoint[n - dice[secondDice].value] = true;
+                            }
+                        }
                     }
                 }
             }
         }
         else if(game.turn == Color.BLACK) {
             if(diceIsPlayed == 1) {
-                if(point[pointNo - 1 - dice[diceIndex].value].status != PointStatus.WHITE){
-                    canPoint[pointNo - 1 - dice[diceIndex].value] = true;
+                if(pointNo - 1 + dice[diceIndex].value < 25) {
+                    if (point[pointNo - 1 + dice[diceIndex].value].status != PointStatus.WHITE) {
+                        canPoint[pointNo - 1 + dice[diceIndex].value] = true;
+                    }
                 }
             }
             else{
-                int n = pointNo - 1 - dice[firstDice].value;
-                if(point[n].status != PointStatus.WHITE){
-                    canPoint[n] = true;
-                    if(point[n - dice[secondDice].value].status != PointStatus.WHITE){
-                        canPoint[n - dice[secondDice].value] = true;
+                int n = pointNo - 1 + dice[firstDice].value;
+                if(n < 25) {
+                    if (point[n].status != PointStatus.WHITE) {
+                        canPoint[n] = true;
+                        if(n + dice[secondDice].value < 25) {
+                            if (point[n + dice[secondDice].value].status != PointStatus.WHITE) {
+                                canPoint[n - dice[secondDice].value] = true;
+                            }
+                        }
                     }
                 }
             }
