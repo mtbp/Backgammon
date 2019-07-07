@@ -11,7 +11,7 @@ public class Model {
     Checker[] blackChecker = new Checker[15];
     Profile whiteProfile;// = new Profile(1,Color.WHITE);
     Profile blackProfile;
-    Game game = new Game(Color.WHITE);
+    Game game;
 
     int[][] moveCheck = new int[2][24];
 
@@ -91,6 +91,8 @@ public class Model {
             whiteProfile = new Profile(3 - playerNo, Color.WHITE);
             blackProfile = new Profile(playerNo, Color.BLACK);
         }
+        game = new Game(color);
+        
         //System.out.println(whiteProfile.playerNo+" "+blackProfile.playerNo);
     }
 
