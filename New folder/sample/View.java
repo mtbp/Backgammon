@@ -66,16 +66,17 @@ import java.util.ArrayList;
 
 public class View  {
 
-    Button button = new Button();
     static final float W = 680;
     static final float H = 560;
     static final float B = 25;
+
     private static Pane root = new Pane();
     private static Pane rootStart = new Pane();
     private static Group homeGroup = new Group();
     public static Group pieceGroup = new Group();
+
     Home[] homes = new Home[24];
-    public Dice dice, dice2;
+    public Dice[] dice = new Dice[2];
     TextField player2name = new TextField();
     TextField player1name = new TextField();
     Dice p1dice = new Dice((W + 27 * B) / 4, 97);
@@ -93,7 +94,8 @@ public class View  {
         black.relocate(W - 8 * B, 130);
         black.setText("Black");
         black.setTextFill(Color.BLACK);
-        startBtn.relocate(W - 7 * B,150);
+        startBtn.relocate(W - 7 * B,160);
+        startBtn.setText("Enter The Game!");
         rootStart.getChildren().addAll(white, black, startBtn);
     }
     public void makeDest(boolean[] dest){
@@ -102,10 +104,21 @@ public class View  {
                 this.homes[i].setDest();
         }
     }
+    public void unMakeDest(){
+        for (int i = 0; i < 24; i++){
+                this.homes[i].disableDest();
+        }
+    }
     public void makeMove(boolean[] canMove){
         for (int i = 1; i <= 24; i++){
             if(canMove[i])
                 this.homes[i - 1].canMove();
+        }
+    }
+    public void unmakeMove(boolean[] canMove){
+        for (int i = 1; i <= 24; i++){
+            if(canMove[i])
+                this.homes[i - 1].resetMove();
         }
     }
     private void setRect(Rectangle rect, float X){
@@ -148,16 +161,28 @@ public class View  {
         menuBG.setFill(Color.web("#333333"));
 
         int[] place = new int[24];
-        for(int i = 0; i < 24; i++)
+        boolean[] color = new boolean[24];
+        for(int i = 0; i < 24; i++) {
             place[i] = 0;
+            color[i] = false;
+        }
         place[0] = 5;
-        place[4] = 103;
-        place[6] = 105;
+        place[4] = 3;
+        place[6] = 5;
         place[11] = 2;
-        place[12] = 105;
+        place[12] = 5;
         place[16] = 3;
         place[18] = 5;
-        place[23] = 102;
+        place[23] = 2;
+        color[0] = true;
+        color[4] = false;
+        color[6] = false;
+        color[11] = true;
+        color[12] = false;
+        color[16] = true;
+        color[18] = true;
+        color[23] = false;
+
         SVGPath border = new SVGPath();
         String path = " " + (W - (4 * B))/2 + " ,0 0,"
                 + (H - 2 * B) +" " + (-(W - (4 * B))/2) + ",0 0," + (-(H - 2 * B)) +" z";
@@ -170,24 +195,21 @@ public class View  {
         root.setPrefSize(W + 10 * B ,H - 11);
 
         for(int homeId = 1; homeId <= 24; homeId++) {
-            //final int temp1 = pnum;
-            final int temp2 = homeId;
             homes[(homeId - 1)] = new Home(homeId, B, W, H);
             homes[(homeId - 1)].setPNum(place[homeId -1]);
             homeGroup.getChildren().addAll(homes[homeId - 1]);
-            for(int pnum = 1; pnum <= (place[homeId - 1] > 100 ? place[homeId - 1] - 100 : place[homeId - 1]); pnum++) {
-                homes[homeId - 1].addPiece(B, W, H, (pnum > 8)? 1 : 0, place[homeId - 1] < 100, homeId > 12);
-
+            for(int pnum = 1; pnum <= place[homeId - 1]; pnum++) {
+                homes[homeId - 1].addPiece(B, W, H, (pnum > 8)? 1 : 0, color[homeId - 1], homeId > 12);
                 pieceGroup.getChildren().addAll(homes[homeId - 1].pieces.get(pnum - 1));
             }
         }
+
         root.getChildren().clear();
         root.getChildren().addAll(menuBG, border, half1, half2, homeGroup, pieceGroup, rollBtn);
-        dice = new Dice((W - 4 * B)/4 - B, H/2);
-        //  dice.setValue(5);
-        dice2 = new Dice((W - 4 * B)/4 + B, H/2 - 2 *B);
-        //dice2.setValue(4);
-        root.getChildren().addAll(dice.d, dice2.d);
+        dice[0] = new Dice((W - 4 * B)/4 - B, H/2);
+        dice[1] = new Dice((W - 4 * B)/4 + B, H/2 - 2 *B);
+        root.getChildren().addAll(dice[0].d, dice[1].d);
+
         return root;
     }
 }
@@ -200,6 +222,7 @@ class Home extends Group{
     private float start = 0;
     private float hW;
     private int hID;
+    boolean color;
     SVGPath tri = new SVGPath();
 
     private void setSVG(SVGPath svg, String path, String colorCode){
@@ -212,6 +235,11 @@ class Home extends Group{
     void setDest(){
         this.tri.setStroke(Color.GREEN);
         this.tri.setStrokeWidth(2);
+    }
+
+    void disableDest(){
+       // this.tri.setStroke(Color.GREEN);
+        this.tri.setStrokeWidth(0);
     }
 
     Home (int id, float B, float W, float H) {
@@ -245,25 +273,26 @@ class Home extends Group{
     }
 
     void addPiece (float B, float W, float H, int x2, boolean color, boolean down){
-        Piece piece = new Piece(this.hID, this.pieces.size(), B, W, H, this.start, x2, color, this.hW,this.pNum, down);
+        this.color = color;
+        Piece piece = new Piece(this.hID, this.pieces.size(), B, W, H, this.start, x2, color, this.hW, down);
         this.pieces.add(piece);
         this.pID++;
 //        this.getChildren().addAll(pieces);
     }
+
     void removePiece(){
         this.pieces.remove(this.pieces.size()-1);
         this.pNum--;
-      //  this.getChildren().clear();
-       // this.getChildren().addAll(pieces);
     }
 
     void canMove(){
         pieces.get(pieces.size() - 1).setMoveable();
     }
-    int getPnum(){
-        return this.pNum;
-    }
 
+    void resetMove(){
+        for (int i = 0; i < pieces.size(); i++)
+            pieces.get(i).resetMoveable();
+    }
     void setPNum(int pNum){
         this.pNum = pNum;
     }
@@ -279,23 +308,27 @@ class Piece extends Group{
     Circle frontCircle3;
     Circle frontCircle4;
     Circle selected;
-    float r1;
-    float r2;
-    float r3;
-    float r4;
-    float r5;
+    private float r1;
+    private float r2;
+    private float r3;
+    private float r4;
+    private float r5;
     double r6;
-    double xShift;
-    final double yS;
-    double yShift;
+    private double xShift;
+    private final double yS;
+    private double yShift;
+    boolean color;
 
-    public void setMoveable(){
+    void setMoveable(){
         this.backCircle.setStroke(Color.RED);
         this.backCircle.setStrokeWidth(2);
     }
-    Piece(int homeID, int pieceID, float B, float W ,float H, float start, int x2, boolean color, float hW, int nTop
+    void resetMoveable(){
+        //this.backCircle.setStroke(Color.RED);
+        this.backCircle.setStrokeWidth(0);
+    }
+    Piece(int homeID, int pieceID, float B, float W ,float H, float start, int x2, boolean color, float hW
             ,boolean down) {
-
 
         r1 = 22;
         r2 = 19;
@@ -305,6 +338,7 @@ class Piece extends Group{
         r6 = 24;
         this.pID = pieceID;
         this.hID = homeID;
+        this.color = color;
         xShift = start + hW / 2 ;
         yShift = (x2 == 0) ?  r1 * (1 + 1.25 * (pieceID)) :  r1 * (1.5 + 1.25 * (pieceID - 8));
         yShift = down ? H - B - yShift: B + yShift;
@@ -331,7 +365,7 @@ class Piece extends Group{
 
     }
 
-    public int pressed(/*double oldMouseX, double oldMouseY*/){
+    int pressed(){
         getChildren().clear();
         this.toFront();
         getChildren().addAll(this.selected, backCircle, frontCircle1, frontCircle2, frontCircle3, frontCircle4);
@@ -342,24 +376,15 @@ class Piece extends Group{
             start = (25 - this.hID);
 
         System.out.println("start : " + start);
-
         return start;
-
     }
 
-    public void test(boolean t){
-        if(t){
-            this.relocate(100,100);
-        }
-    }
-
-
-    public void dragged(double oldMouseX, double oldMouseY, double newMouseX, double newMouseY){
+    void dragged(double oldMouseX, double oldMouseY, double newMouseX, double newMouseY){
         relocate(newMouseX - oldMouseX + xShift - r1,
                 newMouseY - oldMouseY + yS - r1);
     }
 
-    public int released(double mouseX, double mouseY){
+    int released(double mouseX, double mouseY){
         getChildren().clear();
         getChildren().addAll(backCircle, frontCircle1, frontCircle2, frontCircle3, frontCircle4);
         int x = 0;
@@ -375,28 +400,23 @@ class Piece extends Group{
         if((mouseX > 360) & (mouseX < 660) & mouseY > 332 & mouseY < 540)
             x = (int) Math.floor(-(mouseX - 360)/ 50 + 6);
 
-        System.out.println("  end : " + (x + 1));
         return (x+1);
     }
 
-    /*int getID(){
-        return this.pID;
-    }*/
+    void myRelocate(){
+        this.relocate(xShift - r1,yShift - r1);
+    }
+
 }
 class Dice extends StackPane {
 
-    public static final int MAX_VALUE = 6;
-    public static final int MIN_VALUE = 1;
     ImageView d;
-    //  int value;
-    final Animation animation;
-    public final SimpleIntegerProperty valueProperty = new SimpleIntegerProperty();
+    private final Animation animation;
 
-    public Dice(double xShift, double yShift) {
+    Dice(double xShift, double yShift) {
 
         Image diceImage = new Image("file:dice7.png");
         d = new ImageView(diceImage);
-        //Rectangle rect = new Rectangle(50, 50);
         Rectangle2D window = new Rectangle2D(0,0,30,30);
         d.setViewport(window);
         d.relocate(xShift, yShift);
@@ -409,15 +429,10 @@ class Dice extends StackPane {
                 30, 30
         );
         animation.setCycleCount(Animation.INDEFINITE);
-        //animation.play();
-        /*this.setAlignment(Pos.CENTER);*/
-        //  d.setOpacity(0.5);
         getChildren().addAll(d);
-        //this.relocate(200,200);
     }
 
-    public void roll(int value) {
-        //  System.out.println(value + " ");
+    void roll(int value) {
         RotateTransition rt = new RotateTransition(Duration.millis(1400), d);
         rt.setFromAngle(0);
         rt.setToAngle(360);
@@ -425,8 +440,8 @@ class Dice extends StackPane {
         rt.play();
         rt.setOnFinished(event -> {
             animation.stop();
-            final int x = ((value - 1) % 6) * 30  + 0;
-            final int y = ((value - 1) / 6) * 30 + 0;
+            final int x = ((value - 1) % 6) * 30;
+            final int y = ((value - 1) / 6) * 30;
             d.setViewport(new Rectangle2D(x, y, 30, 30));
         });
 
@@ -445,7 +460,7 @@ class SpriteAnimation extends Transition {
 
     private int lastIndex;
 
-    public SpriteAnimation(
+    SpriteAnimation(
             ImageView imageView,
             Duration duration,
             int count,   int columns,
