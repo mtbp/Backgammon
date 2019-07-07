@@ -607,6 +607,17 @@ public class Model {
         return possible;
     }
 
+    public int dicePlayed(){
+        int i = 0;
+        if(dice[0].isPlayed && !dice[1].isPlayed)
+            i = 1;
+        else if(!dice[0].isPlayed && dice[1].isPlayed)
+            i = 2;
+        else if(dice[0].isPlayed && dice[1].isPlayed)
+            i = 3;
+        return i;
+    }
+
     public void displayView(){
         for(int i = 0; i < 24; i++) {
             if (point[i].status != PointStatus.FREE) {
@@ -623,7 +634,17 @@ public class Model {
     }
 
     void nextTurn(){
+        game.smallerDiceFirst = false;
+        for(int i = 0; i < 15; i++){
+            if(game.turn == Color.WHITE){
+                whiteChecker[i].pointNo = whiteChecker[i].newPointNo;
+            }
+            else{
+                blackChecker[i].pointNo = blackChecker[i].newPointNo;
+            }
+        }
         game.changeTurn();
+
     }
 
 
