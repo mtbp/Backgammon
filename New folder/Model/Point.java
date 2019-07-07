@@ -162,17 +162,18 @@ public class Point {
         }
         else{
             this.color = color;
-            this.checkerIndex.remove(0);
+            //this.checkerIndex.remove(0);
             this.checkerIndex.add(index);
         }
-
+        this.checkersNumber++;
+        ///////checkernumber
     }
 
     void removeChecker(){
         this.checkersNumber--;
         this.setPointStatus();
         this.checkerIndex.remove(checkerIndex.size()-1);
-        this.lastCheckerIndex = checkerIndex.get(checkerIndex.size()-1);
+        if(this.checkersNumber > 0) this.lastCheckerIndex = checkerIndex.get(checkerIndex.size()-1);
     }
 
 
