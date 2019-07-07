@@ -31,20 +31,12 @@ public class Controller {
     public void startevent(){
         view.startBtn.setOnMouseClicked(event->{
             Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-            if(view.white.isSelected()) {
+            stage.setScene(new Scene(view.createContent()));
+            if(view.white.isSelected())
                 model.setProfile(0);
-                stage.setScene(new Scene(view.createContent()));
-                event();
-            }
-            if(view.black.isSelected()) {
+            else
                 model.setProfile(1);
-                stage.setScene(new Scene(view.createContent()));
-                event();
-            }
-            if(!view.black.isSelected() & !view.white.isSelected()){
-                view.startBtn.setText("Please Choose a Color!");
-            }
-
+            event();
         });
         view.startrollBtn.setOnMouseClicked(event -> {
             int[] val = model.rollDice();
@@ -66,17 +58,13 @@ public class Controller {
         });
 
         view.white.setOnMouseClicked(event -> {
-           if(view.white.isSelected())
-                view.black.setDisable(true);
-           else
-               view.black.setDisable(false);
+            view.black.setDisable(true);
+
         });
 
         view.black.setOnMouseClicked(event -> {
-            if(view.black.isSelected())
-                view.white.setDisable(true);
-            else
-                view.white.setDisable(false);
+            view.white.setDisable(true);
+
         });
     }
 
@@ -161,12 +149,11 @@ public class Controller {
                     System.out.println("myend = " + myend );
                     if(validmove){
                         view.homes[mystart].removePiece();
-                        view.homes[myend].addPiece(view.B, view.W, view.H,0, true, myend >= 12);
+                        view.homes[myend].addPiece(view.B, view.W, view.H,0, true, end < 12);
                         view.pieceGroup.getChildren().clear();
                         for(int u = 0; u < 24; u++)
                             for(int y = 0; y < view.homes[u].pieces.size(); y++)
                                 view.pieceGroup.getChildren().addAll(view.homes[u].pieces.get(y));
-                            event();
                     }
 
                 });

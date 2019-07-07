@@ -93,8 +93,7 @@ public class View  {
         black.relocate(W - 8 * B, 130);
         black.setText("Black");
         black.setTextFill(Color.BLACK);
-        startBtn.relocate(W - 7 * B,160);
-        startBtn.setText("Enter The Game!");
+        startBtn.relocate(W - 7 * B,150);
         rootStart.getChildren().addAll(white, black, startBtn);
     }
     public void makeDest(boolean[] dest){
