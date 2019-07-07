@@ -518,7 +518,7 @@ public class Model {
         return canPoint;
     }
 
-    public boolean isMovePossible( int origin, int destination) {
+    public boolean isMovePossible( int origin, int destination) { //[0,23]
 
         int diceValue;
         int diceIndex;
@@ -542,7 +542,7 @@ public class Model {
             diceIndex = 1;
         }
 
-        System.out.println(diceValue+" "+diceIndex+" "+diceSum+" "+origin+" "+destination);
+        //System.out.println(diceValue+" "+diceIndex+" "+diceSum+" "+origin+" "+destination);
 
         boolean possible = false;
         if(game.turn == Color.WHITE){
@@ -561,19 +561,20 @@ public class Model {
                     }
                 }
             }
-            System.out.println(possible);
-            /*
+            //System.out.println(possible);
+
             int indexChecker = point[origin].lastCheckerIndex;
             if(possible){
-                if(point[destination].color != Color.WHITE){ //hit is happening
+                if(point[destination].status == PointStatus.BLACKBLOT){ //hit is happening
                     blackProfile.checkersHit++;
                     blackChecker[point[destination].lastCheckerIndex].newPointNo = 0;
+                    point[destination].removeChecker();
                 }
                 whiteChecker[indexChecker].newPointNo = destination;
                 point[origin].removeChecker();
                 point[destination].addChecker(indexChecker, Color.WHITE);
 
-            }*/
+            }
         }
         if(game.turn == Color.BLACK){
             if(point[origin].status == PointStatus.BLACKBLOT | point[origin].status == PointStatus.BLACK){
@@ -593,9 +594,10 @@ public class Model {
             }
             int indexChecker = point[origin].lastCheckerIndex;
             if(possible){
-                if(point[destination].color != Color.BLACK){ //hit is happening
+                if(point[destination].status == PointStatus.WHITEBLOT){ //hit is happening
                     whiteProfile.checkersHit++;
                     whiteChecker[point[destination].lastCheckerIndex].newPointNo = 25;
+                    point[destination].removeChecker();
                 }
                 blackChecker[indexChecker].newPointNo = destination;
                 point[origin].removeChecker();
