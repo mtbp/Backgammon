@@ -98,7 +98,12 @@ public class Model {
 
     ////////////////////////////////////////game starts!!!!!!!!
 
-    public boolean[] checkCheckers(int diceNo){
+    public boolean[] checkCheckers(){
+        int diceNo;
+        if(!dice[0].isPlayed && !dice[1].isPlayed)
+            diceNo = 0;
+        else
+            diceNo = 1;
         // diceNo : 0 -> 2 dices should play - 1 -> 1 dice should play
         //game.turn = Color.WHITE;
         int maxIndex = 0, minIndex = 0;
