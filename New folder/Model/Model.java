@@ -11,7 +11,7 @@ public class Model {
     Checker[] blackChecker = new Checker[15];
     Profile whiteProfile;// = new Profile(1,Color.WHITE);
     Profile blackProfile;
-    Game game;
+    public Game game;
 
     int[][] moveCheck = new int[2][24];
 
@@ -62,6 +62,10 @@ public class Model {
         dice[1].isPlayed = false;
         //System.out.println("rolling dice is done");
         //System.out.println(dice[0].value );
+        //output[0] = 6;
+        //output[1] = 2;
+        //dice[0].value = 6;
+        //dice[1].value = 2;
 
         return output;
     }
@@ -99,6 +103,7 @@ public class Model {
     ////////////////////////////////////////game starts!!!!!!!!
 
     public boolean[] checkCheckers(){
+        //System.out.println("hellooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
         int diceNo;
         if(!dice[0].isPlayed && !dice[1].isPlayed)
             diceNo = 0;
@@ -437,6 +442,13 @@ public class Model {
                 }
             }
         }
+
+        System.out.print("canmove:");
+        for(int i = 0; i < 26; i++){
+            System.out.print(" " + i + " " + canMove[i]);
+        }
+        System.out.println(" ");
+
         return canMove;
     }
 
@@ -500,7 +512,7 @@ public class Model {
         }
         else if(game.turn == Color.BLACK) {
             if(diceIsPlayed == 1) {
-                if(pointNo - 1 + dice[diceIndex].value < 25) {
+                if(pointNo - 1 + dice[diceIndex].value < 24) {
                     if (point[pointNo - 1 + dice[diceIndex].value].status != PointStatus.WHITE) {
                         canPoint[pointNo - 1 + dice[diceIndex].value] = true;
                     }
@@ -508,12 +520,12 @@ public class Model {
             }
             else{
                 int n = pointNo - 1 + dice[firstDice].value;
-                if(n < 25) {
+                if(n < 24) {
                     if (point[n].status != PointStatus.WHITE) {
                         canPoint[n] = true;
-                        if(n + dice[secondDice].value < 25) {
+                        if(n + dice[secondDice].value < 24) {
                             if (point[n + dice[secondDice].value].status != PointStatus.WHITE) {
-                                canPoint[n - dice[secondDice].value] = true;
+                                canPoint[n + dice[secondDice].value] = true;
                             }
                         }
                     }
@@ -570,14 +582,24 @@ public class Model {
 
             int indexChecker = point[origin].lastCheckerIndex;
             if(possible){
-                if(point[destination].status == PointStatus.BLACKBLOT){ //hit is happening
+                /*if(point[destination].status == PointStatus.BLACKBLOT){ //hit is happening
                     blackProfile.checkersHit++;
-                    blackChecker[point[destination].lastCheckerIndex].newPointNo = 0;
+                    blackChecker[point[destination].lastCheckerIndex].pointNo = 0;
                     point[destination].removeChecker();
-                }
-                whiteChecker[indexChecker].newPointNo = destination;
+                }*/
+                System.out.println("destination: " + destination);
+                System.out.println("indexChecker: " + indexChecker);
+                whiteChecker[indexChecker].pointNo = destination + 1;
+                System.out.println("wchecker: " + whiteChecker[indexChecker].pointNo);
+
                 point[origin].removeChecker();
+                point[origin].setPointStatus();
+                //System.out.println("origin checkers: "+point[origin].checkersNumber);
+                //System.out.println("origin status:" + point[origin].status);
                 point[destination].addChecker(indexChecker, Color.WHITE);
+                point[destination].setPointStatus();
+                //System.out.println("destination checkers: "+point[destination].checkersNumber);
+                //System.out.println("destination status:" + point[destination].status);
 
             }
         }
@@ -601,12 +623,15 @@ public class Model {
             if(possible){
                 if(point[destination].status == PointStatus.WHITEBLOT){ //hit is happening
                     whiteProfile.checkersHit++;
-                    whiteChecker[point[destination].lastCheckerIndex].newPointNo = 25;
+                    whiteChecker[point[destination].lastCheckerIndex].pointNo = 25;
                     point[destination].removeChecker();
                 }
-                blackChecker[indexChecker].newPointNo = destination;
+                blackChecker[indexChecker].pointNo = destination;
                 point[origin].removeChecker();
+                point[origin].setPointStatus();
                 point[destination].addChecker(indexChecker, Color.BLACK);
+                point[destination].setPointStatus();
+
             }
         }
         return possible;
@@ -638,15 +663,15 @@ public class Model {
 
     }
 
-    void nextTurn(){
+    public void nextTurn(){
         game.smallerDiceFirst = false;
         for(int i = 0; i < 15; i++){
-            if(game.turn == Color.WHITE){
+            /*if(game.turn == Color.WHITE){
                 whiteChecker[i].pointNo = whiteChecker[i].newPointNo;
             }
             else{
                 blackChecker[i].pointNo = blackChecker[i].newPointNo;
-            }
+            }*/
         }
         game.changeTurn();
 

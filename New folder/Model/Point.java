@@ -136,9 +136,12 @@ public class Point {
     void setPointStatus(){
         if (this.checkersNumber == 0){
             this.status = PointStatus.FREE;
+            System.out.println("im in free");
+
         }
         if(this.color == Color.WHITE) {
             if(this.checkersNumber == 1){
+                System.out.println("im in");
                 this.status = PointStatus.WHITEBLOT;
             }
             else{
@@ -171,7 +174,7 @@ public class Point {
 
     void removeChecker(){
         this.checkersNumber--;
-        this.setPointStatus();
+        //this.setPointStatus();
         this.checkerIndex.remove(checkerIndex.size()-1);
         if(this.checkersNumber > 0) this.lastCheckerIndex = checkerIndex.get(checkerIndex.size()-1);
     }
